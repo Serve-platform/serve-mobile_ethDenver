@@ -4,6 +4,7 @@ import {PERMISSIONS, requestMultiple} from 'react-native-permissions';
 import {NativeEventEmitter, NativeModules} from 'react-native';
 import {getUsers, getUserByUuid} from '~/api/user';
 import {UserProp} from '~/types/users';
+import {getTradeUser} from '@api/trade';
 
 const useBluetooth = () => {
   const [bluetooth, setBluetooth] = useState();
@@ -39,6 +40,8 @@ const useBluetooth = () => {
       peripherals.set(uuid.deviceAddress, uuid);
       // @ts-ignore
       setFoundUuids(Array.from(peripherals.values()));
+      // @ts-ignore
+      setFoundUsers(Array.from(peripherals.values()));
     });
     eventEmitter.addListener('error', message =>
       console.log('> error : ', message),
@@ -49,7 +52,6 @@ const useBluetooth = () => {
   }, []);
 
   useEffect(() => {
-    console.log('> foundUuids : ', foundUuids);
     onGetUserByUuid();
   }, [foundUuids]);
 
@@ -73,13 +75,12 @@ const useBluetooth = () => {
 
   // 받은 uuids로 사용자 정보 조회
   const {mutate: getUserByUuidMutate} = useMutation(
-    async (uuid: string) => {
-      const {data} = await getUserByUuid(uuid);
-      return data;
+    async () => {
+      const {result} = await getTradeUser(foundUuids);
+      return result;
     },
     {
       onSuccess: data => {
-        console.log('>>>> data : ', data);
         setFoundUsers(data);
       },
       onError: () => {},
