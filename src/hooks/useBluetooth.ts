@@ -1,17 +1,19 @@
-import {useEffect, useState} from 'react';
-import {useMutation} from 'react-query';
-import {PERMISSIONS, requestMultiple} from 'react-native-permissions';
 import {NativeEventEmitter, NativeModules} from 'react-native';
-import {getUsers, getUserByUuid} from '~/api/user';
+import {PERMISSIONS, requestMultiple} from 'react-native-permissions';
+import {
+  advertiseStart,
+  advertiseStop,
+  scanStart,
+  scanStop,
+} from 'react-native-ble-phone-to-phone';
+import {useEffect, useState} from 'react';
 import {UserProp} from '~/types/users';
-import {getTradeUser} from '@api/trade';
+import {getTradeUser, getUsers} from '~/api';
+import {useMutation} from 'react-query';
 
 const useBluetooth = () => {
-  const [bluetooth, setBluetooth] = useState();
   const [foundUuids, setFoundUuids] = useState([]);
   const [foundUsers, setFoundUsers] = useState([]);
-
-  const peripherals = new Map();
 
   useEffect(() => {
     // 권한
@@ -29,19 +31,13 @@ const useBluetooth = () => {
     };
     permission().then();
 
-    // 블루투스 모듈
-    const {CustomBluetooth} = NativeModules;
-    setBluetooth(CustomBluetooth);
-
     // 이벤트 리스터
     const eventEmitter = new NativeEventEmitter(NativeModules.BLEAdvertiser);
-    eventEmitter.addListener('foundUuid', uuid => {
-      console.log('> data : ', uuid);
-      peripherals.set(uuid.deviceAddress, uuid);
+    eventEmitter.addListener('foundUuid', data => {
+      console.log('> data : ', data);
+      const newList = new Set([...foundUuids, data.uuid]);
       // @ts-ignore
-      setFoundUuids(Array.from(peripherals.values()));
-      // @ts-ignore
-      setFoundUsers(Array.from(peripherals.values()));
+      setFoundUuids([...newList]);
     });
     eventEmitter.addListener('error', message =>
       console.log('> error : ', message),
@@ -81,6 +77,7 @@ const useBluetooth = () => {
     },
     {
       onSuccess: data => {
+        console.log('> getUserByUuidMutate data : ', data);
         setFoundUsers(data);
       },
       onError: () => {},
@@ -91,22 +88,18 @@ const useBluetooth = () => {
   };
 
   // 자리 양도하기 위한 advertise start
-  const onAdvertiseStart = () => {
-    const token = '724ef650-20c9-439d-a6bd-ba0bfabd4558';
-    // @ts-ignore
-    bluetooth.onAdvertiseStart(token);
+  const onAdvertiseStart = (uuid: string) => {
+    advertiseStart(uuid);
   };
 
   // 자리 양도하기 위한 advertise stop
   const onAdvertiseStop = () => {
-    // @ts-ignore
-    bluetooth.onAdvertiseStop();
+    advertiseStop();
   };
 
   // 자리 양도받기 위해 내릴 사람 찾기 start
   const onScanStart = (uuidsToString: string) => {
-    // @ts-ignore
-    bluetooth.onScanStart(uuidsToString);
+    scanStart(uuidsToString);
 
     setTimeout(() => {
       onScanStop();
@@ -115,8 +108,7 @@ const useBluetooth = () => {
 
   // 자리 양도받기 위해 내릴 사람 찾기 stop
   const onScanStop = () => {
-    // @ts-ignore
-    bluetooth.onScanStop();
+    scanStop();
   };
 
   return {

@@ -6932,6 +6932,11 @@ react-native-ble-manager@^8.8.0:
   resolved "https://registry.yarnpkg.com/react-native-ble-manager/-/react-native-ble-manager-8.8.0.tgz#fc3d565e61f972aba68474ac68e1e605d6993f9e"
   integrity sha512-8rB3IJuoV7yv3ymHKD/Y9JHpV9pJeLWw9UbmszvYPMDOzSlfsO+mE2xCd8J4vpfmDYKFlT6hsMGAkPV5aPzDag==
 
+react-native-ble-phone-to-phone@0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-ble-phone-to-phone/-/react-native-ble-phone-to-phone-0.2.1.tgz#7dced346faf5ef065f3f26cec2ab3840cddab72f"
+  integrity sha512-unIe/bfJH8uPjLMpdPFB0+CbS+Ov3UdBOLGIUNabbcIRZ1spwVlXkKTyFGEDUVPiDls1zqGGdTRDiRtbqPmavg==
+
 react-native-camera-kit@^13.0.0:
   version "13.0.0"
   resolved "https://registry.yarnpkg.com/react-native-camera-kit/-/react-native-camera-kit-13.0.0.tgz#983d9146cdeb0ec0cb0c0a86b7fa5f7690df08f6"
