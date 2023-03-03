@@ -12,12 +12,22 @@ import React, {useEffect, useRef, useState} from 'react';
 import theme from '~/styles/color';
 import {onboarding} from '~/assets/images';
 import {downArrow} from '~/assets/icons';
+import OnModal from '~/components/Home/OnModal';
+import OffModal from '~/components/Home/OffModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {getQrSvg} from '~/api';
+import {useQuery} from 'react-query';
+import {HomeStackNavProps} from '~/navigators/stackNav/HomeStackNav';
+import {useNavigation} from '@react-navigation/native';
+import TextTicker from 'react-native-text-ticker';
 
 const Home = () => {
+  const navigation = useNavigation<HomeStackNavProps>();
   const [onServe, setOnServe] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [OnmodalVisible, setOnModalVisible] = useState(false);
   const moveAnim = useRef(new Animated.Value(-2)).current;
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const [qrData, setQrData] = useState('');
   const moveOn = () => {
     Animated.timing(moveAnim, {
       toValue: 92,
@@ -26,8 +36,38 @@ const Home = () => {
       useNativeDriver: true,
     }).start();
   };
+  const moveQr = () => {
+    setOnModalVisible(!OnmodalVisible);
+    navigation.navigate('QrScan');
+  };
+  const balance__ = 1;
+  const token = 'abc';
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getQrSvgQuery = useQuery(
+    ['getQrSvg', token],
+    async () => {
+      const address__ = await AsyncStorage.getItem('Address');
+
+      if (address__) {
+        const result = await getQrSvg({
+          token__: token,
+          address__: address__,
+          balance__: balance__,
+        });
+        return result;
+      }
+    },
+    {enabled: !!token},
+  );
+
+  const moveQrCode = () => {
+    setModalVisible(!modalVisible);
+    const qrSvg = getQrSvgQuery.data;
+    setQrData(qrSvg);
+    navigation.navigate('QrScreen', {
+      qrData: qrSvg,
+    });
+  };
   const moveOff = async () => {
     Animated.timing(moveAnim, {
       toValue: -2,
@@ -43,7 +83,7 @@ const Home = () => {
     } else {
       moveOff();
     }
-  }, [moveOff, moveOn, onServe]);
+  }, [onServe]);
 
   return (
     <View style={styles.container}>
@@ -80,7 +120,6 @@ const Home = () => {
           }}
         />
       </View>
-
       <Image
         source={onboarding}
         style={{
@@ -90,9 +129,19 @@ const Home = () => {
           height: 199,
         }}
       />
-
       {/* 탑승 정보 */}
-      <View style={styles.boardInfo}>
+      <Pressable
+        onPress={() => {
+          navigation.navigate('BoardingInfo');
+        }}
+        style={[
+          styles.boardInfo,
+          {
+            backgroundColor: onServe
+              ? theme.color.black
+              : 'rgba(245, 245, 245, 0.4)',
+          },
+        ]}>
         <View
           style={{
             position: 'absolute',
@@ -105,18 +154,44 @@ const Home = () => {
             backgroundColor: theme.color.black,
           }}>
           <Text style={{color: theme.color.main, fontWeight: '700'}}>
-            Enter Boarding Info.
+            {onServe ? 'Edit' : 'Enter'} Boarding Info.
           </Text>
         </View>
-        <Text style={{fontSize: 20, color: theme.color.white}}>
-          탑승 정보 입력
-        </Text>
-      </View>
+        {onServe ? (
+          <View
+            style={{
+              width: '100%',
+              alignItems: 'center',
+            }}>
+            <TextTicker
+              style={{
+                fontSize: 20,
+                color: theme.color.white,
+              }}
+              duration={3000}
+              loop
+              bounce={false}>
+              서울메트로 2호선 3386열차 3호칸 탑승 중
+            </TextTicker>
+          </View>
+        ) : (
+          <Text style={{fontSize: 20, color: theme.color.white}}>
+            탑승 정보 입력
+          </Text>
+        )}
+      </Pressable>
 
       {/* SERVE 드래그 버튼 */}
       <View style={styles.dragContainer}>
         <>
-          <Pressable onPress={() => setOnServe(!onServe)}>
+          <Pressable
+            onPress={() => {
+              setOnServe(!onServe);
+              // todo 블루투스 연결
+              // onServe
+              //   ? setModalVisible(!modalVisible)
+              //   : setOnModalVisible(!OnmodalVisible);
+            }}>
             <Animated.View
               style={[
                 styles.dragEnableButton,
@@ -155,6 +230,12 @@ const Home = () => {
           <View style={[styles.dragDisableButton, {bottom: -2, left: -2}]}>
             <Text style={styles.dragDisableText}>Drag to SERVE</Text>
           </View>
+          <View style={{alignItems: 'center'}}>
+            <View style={{alignItems: 'center'}}>
+              <OffModal offModalData={moveQrCode} modalVisible={modalVisible} />
+              <OnModal onModalData={moveQr} modalVisible={OnmodalVisible} />
+            </View>
+          </View>
         </>
       </View>
     </View>
@@ -166,6 +247,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 20,
   },
   title: {
     fontWeight: '700',
@@ -176,7 +258,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 4,
     borderBottomWidth: 4,
     borderColor: theme.color.grayscale.D9D9D9,
-    backgroundColor: 'rgba(245, 245, 245, 0.4)',
     paddingVertical: 18,
     alignItems: 'center',
   },

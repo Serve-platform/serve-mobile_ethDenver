@@ -5,28 +5,29 @@ import {
   CardStyleInterpolators,
 } from '@react-navigation/stack';
 import TabNavigator from '~/navigators/TabNav';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import SignUp from '~/screens/onBoard/SignUp';
-
-export type GlobalStackParamList = {
-  TabNav: undefined;
+import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import QrScreen from '~/screens/QrScreen';
+import QrScan from '~/screens/QrScan';
+import TransferModal from '~/screens/TransferModal';
+type RootStackParamList = {
   SignUp: undefined;
+  TabNav: undefined;
+  QrScreen: undefined;
+  QrScan: undefined;
+  TransferModal: undefined;
 };
-export type SignUpProps = NativeStackScreenProps<
-  GlobalStackParamList,
-  'SignUp'
->;
-export type TabNavProps = NativeStackScreenProps<
-  GlobalStackParamList,
-  'TabNav'
->;
 
 export type GlobalProps = NativeStackScreenProps<
-  GlobalStackParamList,
-  'TabNav'
+  RootStackParamList,
+  'SignUp',
+  'TabNav',
+  'QrScreen',
+  'QrScan',
+  'TransferModal'
 >;
 
-const Stack = createStackNavigator<GlobalStackParamList>();
+const Stack = createStackNavigator<RootStackParamList>();
 
 const GlobalNav = () => {
   return (
@@ -48,6 +49,27 @@ const GlobalNav = () => {
         <Stack.Screen
           name="TabNav"
           component={TabNavigator}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="QrScreen"
+          component={QrScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="QrScan"
+          component={QrScan}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="TransferModal"
+          component={TransferModal}
           options={{
             headerShown: false,
           }}
