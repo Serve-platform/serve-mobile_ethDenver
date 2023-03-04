@@ -10,6 +10,9 @@ import {
   QueryClientProvider,
 } from 'react-query';
 import axios from 'axios';
+import {useRecoilState} from 'recoil';
+import {modalState} from '~/recoils/atoms';
+import DefaultModal from '~/components/DefaultModal';
 
 const App = () => {
   const queryClient = new QueryClient({
@@ -28,12 +31,29 @@ const App = () => {
       },
     }),
   });
+  const [modalOpen, setModalOpen] = useRecoilState(modalState);
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <NavigationContainer>
-        <GlobalNav />
-      </NavigationContainer>
-    </QueryClientProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <NavigationContainer>
+          <GlobalNav />
+        </NavigationContainer>
+      </QueryClientProvider>
+      {modalOpen && (
+        <DefaultModal
+          onPress={modalOpen.onPress}
+          onPressText={modalOpen.onPressText}
+          onCancelText={modalOpen.onCancelText}
+          children={modalOpen.children}
+          modalOpen={modalOpen.isOpen}
+          setModalOpen={(isModalOpen: boolean) =>
+            setModalOpen({...modalOpen, isOpen: isModalOpen})
+          }
+          isBackCancel={modalOpen.isBackCancel}
+        />
+      )}
+    </>
   );
 };
 
