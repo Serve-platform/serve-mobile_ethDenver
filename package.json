@@ -37,6 +37,7 @@
     "react-native-gesture-handler": "^2.9.0",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-level-fs": "^3.0.0",
+    "react-native-modal": "^13.0.1",
     "react-native-os": "^1.0.1",
     "react-native-permissions": "^3.7.3",
     "react-native-qrcode-scanner": "^1.5.5",
