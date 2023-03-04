@@ -4,17 +4,27 @@ import React from 'react';
 import HomeStackNav, {
   HomeStackParamList,
 } from '~/navigators/stackNav/HomeStackNav';
-import {blankFind, blankHome, find, home} from '~/assets/icons';
+import {
+  blankFind,
+  blankHome,
+  blankStore,
+  find,
+  home,
+  Store,
+} from '~/assets/icons';
 import FindStackNav, {
   FindStackParamList,
 } from '~/navigators/stackNav/FindStackNav';
 
 import theme from '~/styles/color';
 import {NavigatorScreenParams} from '@react-navigation/native';
-
+import StoreStackNav, {
+  StoreStackParamList,
+} from '@navigators/stackNav/StoreStackNav';
 export type TabParamList = {
   HomeStackNav: NavigatorScreenParams<HomeStackParamList>;
   FindStackNav: NavigatorScreenParams<FindStackParamList>;
+  StoreStackNav: NavigatorScreenParams<StoreStackParamList>;
 };
 
 const Tabs = createBottomTabNavigator<TabParamList>();
@@ -76,6 +86,22 @@ const TabNavigator = () => {
             <Image
               style={{width: 35, height: 35, marginBottom: 5}}
               source={focused ? find : blankFind}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="StoreStackNav"
+        component={StoreStackNav}
+        options={{
+          headerTitle: 'Store',
+          tabBarLabel: ({focused}) => (
+            <Text style={styles(focused).labelStyle}>Store</Text>
+          ),
+          tabBarIcon: ({focused}) => (
+            <Image
+              style={{width: 35, height: 35, marginBottom: 5}}
+              source={focused ? Store : blankStore}
             />
           ),
         }}
