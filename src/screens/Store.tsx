@@ -1,30 +1,115 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { getMATICBalance, getSEATBalance, privToAccount } from '../../App';
+import {
+  getMATICBalance,
+  getSEATBalance,
+  getSigData,
+  privToAccount,
+  seatCA,
+  seatContract,
+  sendTransfer,
+  web3,
+  zkpVerify,
+} from '../../App';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '~/components/Button';
 import { StoreProps } from '@navigators/stackNav/StoreStackNav';
-import Wallet from '@assets/images/wallet.png';
+
+import Wallet from 'ethereumjs-wallet';
+import WalletImage from '@assets/images/wallet.png';
 import theme from '@styles/color';
+
+export const sendMaticTransfer = async (to: string, amount: string) => {
+  const pk = await AsyncStorage.getItem('PrivateKey');
+  const account = privToAccount(pk);
+
+  const amountBal = web3.utils.toWei(amount, 'ether');
+  const gasAmount = await web3.eth.estimateGas({
+    from: account?.address,
+    to: to,
+    value: amountBal,
+  });
+  const txConfig = {
+    from: account?.address,
+    to: to,
+    value: amountBal,
+    chainId: 80001,
+    gas: gasAmount,
+  };
+  console.log('txConfig', txConfig);
+  sendTransfer(txConfig, account?.privateKey);
+};
+export const sendSeatTransfer = async (to: string, tokenAmount: string) => {
+  const pk = await AsyncStorage.getItem('PrivateKey');
+  const account = privToAccount(pk);
+
+  const tokenAmountBal = web3.utils.toWei(tokenAmount, 'ether');
+  const tmpTxConfig = {
+    from: account?.address,
+    to: to,
+    value: tokenAmountBal,
+  };
+
+  const transferData = seatContract.methods
+    .transfer(tmpTxConfig.to, tmpTxConfig.value)
+    .encodeABI();
+  seatContract.methods
+    .transfer(tmpTxConfig.to, tmpTxConfig.value)
+    .estimateGas({
+      from: tmpTxConfig.from,
+      to: seatCA,
+    })
+    .then((gasAmountProp: any) => {
+      const tokenTxConfig = {
+        from: account?.address,
+        to: seatCA,
+        value: '0x',
+        chainId: 80001,
+        gas: gasAmountProp,
+        data: transferData,
+      };
+      console.log('tokenTxConfig', tokenTxConfig);
+      sendTransfer(tokenTxConfig, account?.privateKey);
+    })
+    .catch((error: any) => {
+      console.log(error);
+    });
+};
 
 const Store = ({}: StoreProps) => {
   const [privateKey, setPrivateKey] = useState('');
-  const [matic, setMatic] = useState('');
-  const [balance, setBalance] = useState('');
+  const [matic, setMatic] = useState('0');
+  const [balance, setBalance] = useState('0');
 
   const getPrivateKey = async () => {
-    const pk = await AsyncStorage.getItem('PrivateKey');
+    const pk = (await AsyncStorage.getItem('PrivateKey')) || null;
     setPrivateKey(pk ? pk : '');
-    console.log('pk', pk);
-    console.log('typeof pk', typeof pk);
     const account = privToAccount(pk);
 
-    const account1 = '0xfD71c28bb8aDe8970a6343cd255dff6899fDA1aD';
-    const account2 = '0x16aA40118337FEC44e7E78C63B51DE5198E8F0dE';
     const bal = await getMATICBalance(account?.address);
-    setMatic(bal);
     const seatBal = await getSEATBalance(account?.address);
+    setMatic(bal);
+    setBalance(seatBal);
+
+    const isVerify = await zkpVerify();
+    await getSigData(account?.privateKey);
+  };
+
+  const generateWallet = async () => {
+    const wallet = Wallet.generate();
+    const privateKey = '0x' + wallet.getPrivateKey().toString('hex');
+    setPrivateKey(privateKey);
+    await AsyncStorage.setItem('PrivateKey', privateKey);
+    await AsyncStorage.setItem(
+      'Address',
+      '0x' + wallet.getAddress().toString('hex'),
+    );
+
+    const account = privToAccount(privateKey);
+    const bal = await getMATICBalance(account?.address);
+    const seatBal = await getSEATBalance(account?.address);
+    setMatic(bal);
     setBalance(seatBal);
   };
 
@@ -36,7 +121,11 @@ const Store = ({}: StoreProps) => {
     <View style={styles.container}>
       <View style={styles.wrapper}>
         <View style={styles.imageContainer}>
-          <Image resizeMode="contain" source={Wallet} style={styles.image} />
+          <Image
+            resizeMode="contain"
+            source={WalletImage}
+            style={styles.image}
+          />
         </View>
         <View style={styles.wallet}>
           <Button title={`내 지갑 정보`} type={`white`} />
@@ -59,7 +148,18 @@ const Store = ({}: StoreProps) => {
         </View>
       </View>
 
-      <Button title={`전환하기`} type={`yellow`} style={styles.button} />
+      {privateKey ? (
+        <Button title={`전환하기`} type={`yellow`} style={styles.button} />
+      ) : (
+        <Button
+          title={`지갑생성`}
+          type={`white`}
+          style={{
+            marginTop: 10,
+          }}
+          onPress={generateWallet}
+        />
+      )}
     </View>
   );
 };
