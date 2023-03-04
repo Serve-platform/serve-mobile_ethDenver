@@ -1,56 +1,33 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, ScrollView, View } from 'react-native';
-import {
-  FindProps,
-  FindStackNavProps,
-} from '@navigators/stackNav/FindStacknav';
+import React, {useState} from 'react';
+import {StyleSheet, Text, ScrollView, View} from 'react-native';
+import {FindProps, FindStackNavProps} from '~/navigators/stackNav/FindStackNav';
 import useBluetooth from '~/hooks/useBluetooth';
-import { UserProp } from '~/types';
+import {UserProp} from '~/types/users';
 import theme from '@styles/color';
 import Button from '@components/Button';
 import DragButton from '@components/DragButton';
-import { useNavigation } from '@react-navigation/native';
-import { useRecoilState } from 'recoil';
-import { modalState } from '~/recoil/atoms';
-import InfiniteTrain from '@components/InfiniteTrain';
-import TextLoopTicker from '@components/TextLoopTicker';
-import SeatSelector from '@components/SeatSelector';
-import { useMutation, useQuery } from 'react-query';
-import {
-  getSeatBySeatId,
-  patchSeatBySeatId,
-  StateType,
-  TrainSeatsType,
-} from '~/api';
+import {useNavigation} from '@react-navigation/native';
+import {useRecoilState, useSetRecoilState} from 'recoil';
+import {modalState} from '~/recoils/atoms';
+import InfiniteTrain from '~/components/InfiniteTrain';
 
 const Index = ({}: FindProps) => {
   const navigation = useNavigation<FindStackNavProps>();
-  const { foundUsers, onGetUsersForScanStart, onScanStop } = useBluetooth();
+  const {foundUsers, onGetUsersForScanStart, onScanStop} = useBluetooth();
   const [onFind, setOnFind] = useState(false);
-
-  const [seatIdForDeal, setSeatIdForDeal] = useState(0);
-  const [isAcceptDeal, setIsAcceptDeal] = useState(false);
-
-  const [modalOpen, setModalOpen] = useRecoilState(modalState);
 
   const toggleFind = async () =>
     onFind ? onScanStop() : onGetUsersForScanStart();
 
-  const patchSeatBySeatIdMutation = useMutation(
-    'patchSeatBySeatId',
-    ({ seatId, state }: { seatId: number; state: StateType }) =>
-      patchSeatBySeatId(seatId, state),
-  );
+  const [modalOpen] = useRecoilState(modalState);
+  const setModalOpen = useSetRecoilState(modalState);
 
-  const getSeatId = (item: UserProp) => item.ownerSeat[0].id;
-  // item.ownerSeat.filter(seat => seat.state === 1)[0].id;
-
-  const openRequestModal = (item: UserProp) => {
+  const openRequestModal = () => {
     setModalOpen({
       isOpen: true,
       onPressText: '요청하기',
       onCancelText: '닫기',
-      onPress: () => request(item),
+      onPress: request,
       children: (
         <>
           <Text
@@ -59,7 +36,7 @@ const Index = ({}: FindProps) => {
               fontWeight: '700',
               color: theme.color.black,
             }}>
-            {item.nickName}
+            item.nickName
           </Text>
           <Text
             style={{
@@ -69,41 +46,39 @@ const Index = ({}: FindProps) => {
             }}>
             3 Seat
           </Text>
-          <TextLoopTicker
+          <Text
             style={{
-              marginTop: 10,
-              marginBottom: 30,
-              backgroundColor: theme.color.black,
-            }}
-            content={item.locationinfo}
-          />
-          <SeatSelector seatId={getSeatId(item)} />
+              fontSize: 18,
+              color: theme.color.black,
+              textAlign: 'center',
+              lineHeight: 21,
+              marginVertical: 25,
+            }}>
+            {'서울지하철 2호선\n7236 열차 3-2 출입문 근처'}
+          </Text>
         </>
       ),
     });
   };
-  const request = (item: UserProp) => {
-    const seatId = getSeatId(item);
-    patchSeatBySeatIdMutation.mutate({
-      seatId: seatId,
-      state: 2,
-    });
-
-    setIsAcceptDeal(true);
-    setSeatIdForDeal(seatId);
-
+  const request = () => {
+    // state 1을 2로 patch
+    // setModalOpen({ ...modalOpen, isOpen: false });
     setModalOpen({
       isOpen: true,
+      onPressText: '',
       onCancelText: '취소',
+      onPress: () => {
+        return false;
+      },
       children: (
-        <>
+        <View>
           <Text
             style={{
               fontSize: 20,
               fontWeight: '700',
               color: theme.color.black,
             }}>
-            {item.nickName}
+            item.nickName
           </Text>
           <Text
             style={{
@@ -114,110 +89,62 @@ const Index = ({}: FindProps) => {
             에게 양보 요청 중
           </Text>
           <InfiniteTrain />
-        </>
+        </View>
       ),
     });
   };
 
-  useQuery<TrainSeatsType, Error>(
-    ['getSeatBySeatId', isAcceptDeal],
-    async () => {
-      if (seatIdForDeal > 0) {
-        const res = await getSeatBySeatId(seatIdForDeal);
-        return res;
-      }
-    },
-    {
-      onSuccess: (data: any) => {
-        if (data.state === 3 && seatIdForDeal > 0 && isAcceptDeal) {
-          setIsAcceptDeal(false);
-          setModalOpen({
-            isOpen: true,
-            onPressText: '거래하기',
-            onCancelText: '거절',
-            onPress: moveQrScan,
-            children: (
-              <>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: '700',
-                    color: theme.color.black,
-                  }}>
-                  {data.owner.nickName}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: '700',
-                    color: theme.color.black,
-                  }}>
-                  의 양보 요청 수락
-                </Text>
-                <TextLoopTicker
-                  style={{
-                    marginTop: 10,
-                    marginBottom: 10,
-                    backgroundColor: theme.color.black,
-                  }}
-                  content={data.owner.locationinfo}
-                />
-                <Text
-                  style={{
-                    marginBottom: 30,
-                    fontSize: 14,
-                    color: theme.color.black,
-                  }}>
-                  {data.owner.nickName}의 좌석으로 이동하세요
-                </Text>
-              </>
-            ),
-          });
-        }
-      },
-      refetchInterval: 1000,
-      enabled: !!isAcceptDeal,
-    },
-  );
-
-  const moveQrScan = () => {
-    setModalOpen({ ...modalOpen, isOpen: false });
-    navigation.navigate('QrScan');
-  };
+  // navigation.navigate('ConfirmDeal');
 
   return (
     <View style={styles.container}>
-      {foundUsers.length > 0 ? (
-        <ScrollView>
-          {foundUsers.map((item: UserProp, i) => (
-            <View key={`found-${i}-${item.nickName}`} style={styles.wrapper}>
-              <View style={styles.wrapper}>
-                <Text style={styles.image}>{item.image}</Text>
-                <View style={styles.info}>
-                  <Text style={styles.nickName}>{item.nickName}</Text>
-                  <Text style={styles.locationInfo}>{item.locationinfo}</Text>
-                </View>
-              </View>
-              {item.ownerSeat.length > 0 && (
-                <Button
-                  title={`좌석보기 >`}
-                  type={`small`}
-                  style={{ right: 0 }}
-                  onPress={() => openRequestModal(item)}
-                />
-              )}
+      <Text>Find</Text>
+
+      {/*{foundUsers.length > 0 ? (*/}
+      {/*  <ScrollView>*/}
+      {/*    {foundUsers.map((item: UserProp, i) => (*/}
+      {/*      <View key={`found-${i}-${item.nickName}`} style={styles.wrapper}>*/}
+      {/*        <View style={styles.wrapper}>*/}
+      {/*          <Text style={styles.image}>{item.image}</Text>*/}
+      {/*          <View style={styles.info}>*/}
+      {/*            <Text style={styles.nickName}>{item.nickName}</Text>*/}
+      {/*            <Text style={styles.transArr}>{item.transAcc}</Text>*/}
+      {/*          </View>*/}
+      {/*        </View>*/}
+      {/*        <Button*/}
+      {/*          title={`좌석보기 >`}*/}
+      {/*          type={`small`}*/}
+      {/*          style={{ right: 0 }}*/}
+      {/*        />*/}
+      {/*      </View>*/}
+      {/*    ))}*/}
+      {/*  </ScrollView>*/}
+      {/*) : (*/}
+      {/*  <DragButton*/}
+      {/*    onPress={toggleFind}*/}
+      {/*    isOn={onFind}*/}
+      {/*    setIsOn={(is: boolean) => setOnFind(is)}*/}
+      {/*    type={'find'}*/}
+      {/*    style={styles.dragButton}*/}
+      {/*  />*/}
+      {/*)}*/}
+      <ScrollView>
+        <View style={styles.wrapper}>
+          <View style={styles.wrapper}>
+            <Text style={styles.image}></Text>
+            <View style={styles.info}>
+              <Text style={styles.nickName}>asdfadsfa</Text>
+              <Text style={styles.transArr}>3333</Text>
             </View>
-          ))}
-        </ScrollView>
-      ) : (
-        <DragButton
-          onPress={toggleFind}
-          isOn={onFind}
-          setIsOn={(is: boolean) => setOnFind(is)}
-          type={'find'}
-          style={styles.dragButton}
-        />
-      )}
+          </View>
+          <Button
+            title={`좌석보기 >`}
+            type={`small`}
+            style={{right: 0}}
+            onPress={openRequestModal}
+          />
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -250,7 +177,7 @@ const styles = StyleSheet.create({
     color: theme.color.main,
     fontWeight: 'bold',
   },
-  locationInfo: {
+  transArr: {
     fontSize: 14,
     color: theme.color.white,
   },
