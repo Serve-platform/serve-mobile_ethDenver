@@ -1,33 +1,36 @@
-import {Image, Platform, TouchableOpacity} from 'react-native';
-import React from 'react';
 import {
-  createStackNavigator,
   CardStyleInterpolators,
   StackNavigationProp,
+  createStackNavigator,
 } from '@react-navigation/stack';
-import TabNavigator from '~/navigators/TabNav';
-import SignUp from '~/screens/onBoard/SignUp';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import QrScreen from '~/screens/QrScreen';
-import QrScan from '~/screens/QrScan';
-import TransferModal from '~/screens/TransferModal';
+import { Image, Platform, TouchableOpacity } from 'react-native';
+import { backArrow, close } from '~/assets/icons';
+
 import BoardingInfo from '~/screens/Home/BoardingInfo';
-import theme from '~/styles/color';
-import {useNavigation} from '@react-navigation/native';
 import ConfirmDeal from '@screens/Find/ConfirmDeal';
 import ConfirmDealByPassword from '@screens/Find/ConfirmDealByPassword';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import QrScan from '~/screens/QrScan';
+import QrScreen from '~/screens/QrScreen';
+import React from 'react';
 import SelectSeatInfo from '~/screens/Home/SelectSeatInfo';
-import {backArrow, close} from '~/assets/icons';
+import SignUp from '~/screens/onBoard/SignUp';
+import TabNavigator from '~/navigators/TabNav';
+import TransferModal from '~/screens/TransferModal';
+import { seatIdState } from '~/recoil/atoms';
+import theme from '~/styles/color';
+import { useNavigation } from '@react-navigation/native';
+import { useSetRecoilState } from 'recoil';
 
-type GlobalStackParamList = {
+export type GlobalStackParamList = {
   SignUp: undefined;
   TabNav: undefined;
-  QrScreen: {seatId: number};
+  QrScreen: { qrData: string };
   QrScan: undefined;
   TransferModal: undefined;
-  ConfirmDeal: {value: any};
-  ConfirmDealByPassword: {seatId: number};
   BoardingInfo: undefined;
+  ConfirmDeal: undefined;
+  ConfirmDealByPassword: undefined;
   SelectSeatInfo: undefined;
 };
 
@@ -46,7 +49,6 @@ export type GlobalProps = NativeStackScreenProps<
   GlobalStackParamList,
   'TabNav'
 >;
-
 export type BoardingInfoProps = StackNavigationProp<
   GlobalStackParamList,
   'BoardingInfo'
@@ -59,6 +61,7 @@ export type ConfirmDealByPasswordProps = StackNavigationProp<
   GlobalStackParamList,
   'ConfirmDealByPassword'
 >;
+
 export type QrScreenProps = NativeStackScreenProps<
   GlobalStackParamList,
   'QrScreen'
@@ -71,13 +74,16 @@ export type TransferModalProps = NativeStackScreenProps<
   GlobalStackParamList,
   'TransferModal'
 >;
+
 const Stack = createStackNavigator<GlobalStackParamList>();
 
 const GlobalNav = () => {
+  const setSeatId = useSetRecoilState(seatIdState);
   const navigation = useNavigation<BoardingInfoProps>();
   const navigationConfirmDeal = useNavigation<ConfirmDealProps>();
   const navigationConfirmDealByPassword =
     useNavigation<ConfirmDealByPasswordProps>();
+
   return (
     <>
       <Stack.Navigator
@@ -87,7 +93,7 @@ const GlobalNav = () => {
             height: 80,
             backgroundColor: theme.color.black,
           },
-          cardStyle: {backgroundColor: theme.color.black},
+          cardStyle: { backgroundColor: theme.color.black },
           headerTitleStyle: {
             fontSize: 16,
             color: theme.color.white,
@@ -118,12 +124,9 @@ const GlobalNav = () => {
             headerTitle: '탑승정보 입력',
             headerLeft: () => (
               <TouchableOpacity
-                hitSlop={{top: 30, bottom: 30, left: 30, right: 30}}
-                style={{marginLeft: 30}}
-                onPress={() => {
-                  navigation.goBack();
-                  console.log('close');
-                }}>
+                hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}
+                style={{ marginLeft: 30 }}
+                onPress={() => navigation.goBack()}>
                 <Image
                   style={{
                     width: 16,
@@ -142,9 +145,12 @@ const GlobalNav = () => {
             headerTitle: '탑승정보 입력',
             headerLeft: () => (
               <TouchableOpacity
-                hitSlop={{top: 30, bottom: 30, left: 30, right: 30}}
-                style={{marginLeft: 30}}
-                onPress={() => navigation.goBack()}>
+                hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}
+                style={{ marginLeft: 30 }}
+                onPress={() => {
+                  setSeatId(null);
+                  navigation.goBack();
+                }}>
                 <Image
                   style={{
                     width: 16,
@@ -184,8 +190,8 @@ const GlobalNav = () => {
             headerTitle: '거래하기',
             headerLeft: () => (
               <TouchableOpacity
-                hitSlop={{top: 30, bottom: 30, left: 30, right: 30}}
-                style={{marginLeft: 30}}
+                hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}
+                style={{ marginLeft: 30 }}
                 onPress={() => {
                   navigationConfirmDeal.goBack();
                 }}>
@@ -207,8 +213,8 @@ const GlobalNav = () => {
             headerTitle: '거래하기',
             headerLeft: () => (
               <TouchableOpacity
-                hitSlop={{top: 30, bottom: 30, left: 30, right: 30}}
-                style={{marginLeft: 30}}
+                hitSlop={{ top: 30, bottom: 30, left: 30, right: 30 }}
+                style={{ marginLeft: 30 }}
                 onPress={() => {
                   navigationConfirmDealByPassword.goBack();
                 }}>

@@ -1,10 +1,9 @@
-import {View, Text, TouchableOpacity, Image} from 'react-native';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
 import React from 'react';
-import {GlobalProps} from '../navigators/GlobalNav';
-import {close} from '~/assets/icons';
+import { close } from '~/assets/icons';
+import { TransferModalProps } from '~/navigators/GlobalNav';
 
-const TransferModal = ({navigation}: GlobalProps) => {
-  console.log('1');
+const TransferModal = ({ navigation }: TransferModalProps) => {
   return (
     <View
       style={{
@@ -14,9 +13,9 @@ const TransferModal = ({navigation}: GlobalProps) => {
         backgroundColor: 'black',
       }}>
       <TouchableOpacity
-        style={{position: 'absolute', left: 30, top: 30}}
+        style={{ position: 'absolute', left: 30, top: 30 }}
         onPress={() => navigation.goBack()}>
-        <Image source={close} style={{width: 15, height: 15}} />
+        <Image source={close} style={{ width: 15, height: 15 }} />
       </TouchableOpacity>
       <View
         style={{
@@ -35,7 +34,7 @@ const TransferModal = ({navigation}: GlobalProps) => {
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          <Text style={{color: 'black', fontSize: 26, fontWeight: '700'}}>
+          <Text style={{ color: 'black', fontSize: 26, fontWeight: '700' }}>
             CONFIRM
           </Text>
         </TouchableOpacity>

@@ -1,4 +1,5 @@
 import {
+  Alert,
   Animated,
   Dimensions,
   Easing,
@@ -9,9 +10,9 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 
-import {downArrow} from '~/assets/icons';
+import { downArrow } from '~/assets/icons';
 import theme from '~/styles/color';
 
 interface DragButtonPropType {
@@ -20,6 +21,7 @@ interface DragButtonPropType {
   setIsOn: (serve: boolean) => void;
   type: 'serve' | 'find';
   style?: ViewStyle;
+  disabled?: boolean;
 }
 
 const DragButton = ({
@@ -28,9 +30,10 @@ const DragButton = ({
   setIsOn,
   type,
   style,
+  disabled,
 }: DragButtonPropType) => {
   const moveAnim = useRef(new Animated.Value(-2)).current;
-  const typeUpperCase = type;
+  const typeUpperCase = type.toUpperCase();
 
   const moveOn = () => {
     Animated.timing(moveAnim, {
@@ -63,6 +66,10 @@ const DragButton = ({
       <>
         <Pressable
           onPress={() => {
+            if (disabled) {
+              Alert.alert('탑승 정보를 입력하세요');
+              return;
+            }
             onPress();
             setIsOn(!isOn);
           }}>
@@ -72,7 +79,7 @@ const DragButton = ({
               {
                 left: -2,
                 backgroundColor: isOn ? theme.color.main : theme.color.black,
-                transform: [{translateY: moveAnim}],
+                transform: [{ translateY: moveAnim }],
               },
             ]}>
             <Text
@@ -86,7 +93,7 @@ const DragButton = ({
             </Text>
           </Animated.View>
         </Pressable>
-        <View style={[styles.dragDisableButton, {top: -2, left: -2}]}>
+        <View style={[styles.dragDisableButton, { top: -2, left: -2 }]}>
           <Text style={styles.dragDisableText}>Drag to cancel</Text>
         </View>
         <Image
@@ -96,10 +103,10 @@ const DragButton = ({
             height: 24,
             zIndex: -1,
             alignSelf: 'center',
-            transform: [{rotate: isOn ? '180deg' : '0deg'}],
+            transform: [{ rotate: isOn ? '180deg' : '0deg' }],
           }}
         />
-        <View style={[styles.dragDisableButton, {bottom: -2, left: -2}]}>
+        <View style={[styles.dragDisableButton, { bottom: -2, left: -2 }]}>
           <Text style={styles.dragDisableText}>Drag to {typeUpperCase}</Text>
         </View>
       </>

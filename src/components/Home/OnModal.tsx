@@ -1,13 +1,14 @@
-import {View, Text, Modal, TouchableOpacity, Image} from 'react-native';
-import React, {useState} from 'react';
-import {avatar} from '~/assets/icons';
+import { Image, Modal, Text, TouchableOpacity, View } from 'react-native';
+
+import React from 'react';
+import { avatar } from '~/assets/icons';
 
 interface OffModalProps {
   onModalData: () => void;
   modalVisible: boolean;
 }
 
-const OnModal = ({onModalData, modalVisible}: OffModalProps) => {
+const OnModal = ({ onModalData, modalVisible }: OffModalProps) => {
   return (
     <View>
       <Modal
@@ -25,7 +26,7 @@ const OnModal = ({onModalData, modalVisible}: OffModalProps) => {
             left: 50,
             borderRadius: 20,
           }}>
-          <View style={{top: 50, alignItems: 'center'}}>
+          <View style={{ top: 50, alignItems: 'center' }}>
             <Text
               style={{
                 color: '#000000',
@@ -34,14 +35,14 @@ const OnModal = ({onModalData, modalVisible}: OffModalProps) => {
               }}>
               Nick Name
             </Text>
-            <Text style={{fontWeight: '600', fontSize: 14}}>
+            <Text style={{ fontWeight: '600', fontSize: 14 }}>
               의 양보 요청 수락
             </Text>
-            <Text style={{fontWeight: '600', fontSize: 14, top: 30}}>
+            <Text style={{ fontWeight: '600', fontSize: 14, top: 30 }}>
               ~~의 좌석으로 이동하세요
             </Text>
           </View>
-          <View style={{position: 'absolute', bottom: 250}}>
+          <View style={{ position: 'absolute', bottom: 250 }}>
             <Image
               source={avatar}
               style={{
@@ -64,9 +65,9 @@ const OnModal = ({onModalData, modalVisible}: OffModalProps) => {
               borderColor: 'black',
             }}
             onPress={() => onModalData()}>
-            <Text style={{fontSize: 18}}>거래하기</Text>
+            <Text style={{ fontSize: 18 }}>거래하기</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={{top: 120}} onPress={() => {}}>
+          <TouchableOpacity style={{ top: 120 }} onPress={() => {}}>
             <Text>거절</Text>
           </TouchableOpacity>
         </View>

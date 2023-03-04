@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import theme from '~/styles/color';
 
@@ -7,7 +7,7 @@ type Props = {
   isValidate?: boolean;
   hasDescription?: boolean;
 };
-const Label = ({title, isValidate, hasDescription}: Props) => {
+const Label = ({ title, isValidate, hasDescription }: Props) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>

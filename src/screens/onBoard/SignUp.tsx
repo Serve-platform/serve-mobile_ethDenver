@@ -1,5 +1,5 @@
-import {View, Text, TouchableOpacity, Image} from 'react-native';
-import React, {useState} from 'react';
+import { View, Text, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
 import Wallet from 'ethereumjs-wallet';
 import Logo from '~/assets/icons/logo.png';
 // import kakao from '~/assets/icons/kakao.png';
@@ -7,9 +7,9 @@ import onboarding from '~/assets/images/onboarding.png';
 import walletIcon from '~/assets/icons/wallet.png';
 import theme from '~/styles/color';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {SignUpProps} from '~/navigators/GlobalNav';
+import { SignUpProps } from '~/navigators/GlobalNav';
 
-const SignUp = ({navigation}: SignUpProps) => {
+const SignUp = ({ navigation }: SignUpProps) => {
   const [privateKey, setPrivateKey] = useState<string>();
   const [address, setAddress] = useState<string>();
 
@@ -17,7 +17,7 @@ const SignUp = ({navigation}: SignUpProps) => {
     const wallet = Wallet.generate();
     setPrivateKey('0x' + wallet.getPrivateKey().toString('hex'));
     AsyncStorage.setItem(
-      'PricateKey',
+      'PrivateKey',
       '0x' + wallet.getPrivateKey().toString('hex'),
     );
     setAddress('0x' + wallet.getAddress().toString('hex'));
@@ -74,7 +74,7 @@ const SignUp = ({navigation}: SignUpProps) => {
         }}
       />
 
-      <View style={{width: '100%'}}>
+      <View style={{ width: '100%' }}>
         {/*<TouchableOpacity*/}
         {/*  style={{*/}
         {/*    paddingVertical: 16,*/}
@@ -184,7 +184,7 @@ const SignUp = ({navigation}: SignUpProps) => {
         </TouchableOpacity>
       </View>
 
-      <Text style={{color: theme.color.white}}>© Team Serve</Text>
+      <Text style={{ color: theme.color.white }}>© Team Serve</Text>
     </View>
   );
 };

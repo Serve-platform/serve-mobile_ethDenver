@@ -2,9 +2,14 @@
  * @format
  */
 
-import {AppRegistry} from 'react-native';
-import App from './App';
-import {name as appName} from './app.json';
+import './global.js';
+import { AppRegistry } from 'react-native';
+import { name as appName } from './app.json';
+import AppHoc from './AppHoc';
 import './shim.js'; // 추가된 코드
 
-AppRegistry.registerComponent(appName, () => App);
+AppRegistry.registerComponent(appName, () => AppHoc);
+
+/**
+ * @format
+ */

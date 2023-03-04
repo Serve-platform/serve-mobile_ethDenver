@@ -1,35 +1,47 @@
-import {View, Text, Alert, StyleSheet, TouchableOpacity} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {CameraScreen} from 'react-native-camera-kit';
-import {GlobalProps} from '~/navigators/GlobalNav';
+import React, { useEffect, useState } from 'react';
+import { Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-const QrScan = ({navigation}: GlobalProps) => {
-  const onSuccess = (e: any) => {
-    console.log(e.data);
+import { QrScanProps } from '~/navigators/GlobalNav';
+import theme from '@styles/color';
+import { Camera, CameraType } from 'react-native-camera-kit';
+
+const QrScan = ({ navigation }: QrScanProps) => {
+  const onBarCodeRead = (event: any) => {
+    console.log(
+      '> event.nativeEvent.codeStringValue : ',
+      event.nativeEvent.codeStringValue,
+    );
+    navigation.navigate('ConfirmDeal');
+    // setScaned(true)
   };
-  const [flashMode, setFlashMode] = useState('off');
-  const [qrCode, setQRCode] = useState(null);
-  const onBarcodeScan = (event: any) => {
-    const data = event.nativeEvent.codeStringValue;
-    setQRCode(data);
-    console.log(data);
-  };
-  useEffect(() => {
-    if (qrCode) {
-      console.log('QR Code Scanned', qrCode);
-      navigation.navigate('TransferModal');
-    }
-  }, [qrCode]);
 
   return (
-    <View>
-      <View style={{width: 100, height: 100}}>
-        <CameraScreen
-          onReadCode={onBarcodeScan}
+    <View style={styles.container}>
+      <View
+        style={{
+          marginTop: 180,
+          width: 300,
+          height: 300,
+        }}>
+        <Text
+          style={{
+            marginBottom: 20,
+            textAlign: 'center',
+            color: theme.color.white,
+          }}>
+          QR코드를 스캔해주세요
+        </Text>
+        <Camera
+          style={{ flex: 1 }}
+          ref={null}
+          cameraType={CameraType.Back}
+          scanBarcode
           showFrame={true}
-          frameColor={'#00FF00'}
-          scanBarcode={true}
-          laserColor={'#FF3D00'}
+          laserColor="rgba(0, 0, 0, 0)"
+          frameColor="rgba(0, 0, 0, 0)"
+          surfaceColor="rgba(0, 0, 0, 0)"
+          onReadCode={onBarCodeRead}
         />
       </View>
     </View>
@@ -39,8 +51,11 @@ const QrScan = ({navigation}: GlobalProps) => {
 export default QrScan;
 
 const styles = StyleSheet.create({
-  cameraContainer: {
-    height: '100%',
+  container: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   centerText: {
     flex: 1,

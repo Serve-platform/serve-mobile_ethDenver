@@ -1,10 +1,10 @@
-import {Platform, StyleSheet} from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import {
   createStackNavigator,
   CardStyleInterpolators,
 } from '@react-navigation/stack';
 import React from 'react';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import Store from '@screens/Store';
 import theme from '@styles/color';
 
@@ -20,9 +20,9 @@ const StoreStackNav = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: {backgroundColor: theme.color.black},
-        headerTitleStyle: {color: theme.color.white, fontWeight: '900'},
-        cardStyle: {backgroundColor: theme.color.black},
+        headerStyle: { backgroundColor: theme.color.black },
+        headerTitleStyle: { color: theme.color.white, fontWeight: '900' },
+        cardStyle: { backgroundColor: theme.color.black },
         cardStyleInterpolator:
           Platform.OS === 'android'
             ? CardStyleInterpolators.forFadeFromBottomAndroid

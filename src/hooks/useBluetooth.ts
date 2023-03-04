@@ -1,15 +1,16 @@
-import {NativeEventEmitter, NativeModules} from 'react-native';
-import {PERMISSIONS, requestMultiple} from 'react-native-permissions';
+import { NativeEventEmitter, NativeModules } from 'react-native';
+import { PERMISSIONS, requestMultiple } from 'react-native-permissions';
 import {
   advertiseStart,
   advertiseStop,
   scanStart,
   scanStop,
 } from 'react-native-ble-phone-to-phone';
-import {useEffect, useState} from 'react';
-import {UserProp} from '~/types/users';
-import {getTradeUser, getUsers} from '~/api';
-import {useMutation} from 'react-query';
+import { getTradeUser, getUsers } from '~/api';
+import { useEffect, useState } from 'react';
+
+import { UserProp } from '~/types';
+import { useMutation } from 'react-query';
 
 const useBluetooth = () => {
   const [foundUuids, setFoundUuids] = useState([]);
@@ -52,9 +53,9 @@ const useBluetooth = () => {
   }, [foundUuids]);
 
   // 전체 사용자 목록
-  const {mutate: getUsersMutate} = useMutation(
+  const { mutate: getUsersMutate } = useMutation(
     async () => {
-      const {data} = await getUsers();
+      const { data } = await getUsers();
       return data;
     },
     {
@@ -70,9 +71,9 @@ const useBluetooth = () => {
   };
 
   // 받은 uuids로 사용자 정보 조회
-  const {mutate: getUserByUuidMutate} = useMutation(
+  const { mutate: getUserByUuidMutate } = useMutation(
     async () => {
-      const {result} = await getTradeUser(foundUuids);
+      const { result } = await getTradeUser(foundUuids);
       return result;
     },
     {

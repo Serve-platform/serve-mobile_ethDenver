@@ -1,4 +1,4 @@
-import {Platform} from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import {
   createStackNavigator,
   CardStyleInterpolators,
@@ -6,12 +6,12 @@ import {
 } from '@react-navigation/stack';
 import React from 'react';
 import theme from '~/styles/color';
-import {CompositeNavigationProp} from '@react-navigation/native';
-import {GlobalStackParamList} from '~/navigators/GlobalNav';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { GlobalStackParamList } from '~/navigators/GlobalNav';
 
 import Home from '~/screens/Home/Home';
-import {TabParamList} from '~/navigators/TabNav';
-import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs';
+import { TabParamList } from '~/navigators/TabNav';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 export type HomeStackParamList = {
   Home: undefined;
@@ -28,9 +28,9 @@ const HomeStackNav = () => {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerStyle: {backgroundColor: theme.color.black},
-        headerTitleStyle: {color: theme.color.white, fontWeight: '900'},
-        cardStyle: {backgroundColor: theme.color.black},
+        headerStyle: { backgroundColor: theme.color.black },
+        headerTitleStyle: { color: theme.color.white, fontWeight: '900' },
+        cardStyle: { backgroundColor: theme.color.black },
         cardStyleInterpolator:
           Platform.OS === 'android'
             ? CardStyleInterpolators.forFadeFromBottomAndroid
@@ -49,3 +49,5 @@ const HomeStackNav = () => {
 };
 
 export default HomeStackNav;
+
+const styles = StyleSheet.create({});

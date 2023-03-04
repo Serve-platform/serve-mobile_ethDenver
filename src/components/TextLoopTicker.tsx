@@ -1,4 +1,4 @@
-import {StyleSheet, Text, View, ViewStyle} from 'react-native';
+import { StyleSheet, Text, View, ViewStyle } from 'react-native';
 
 import React from 'react';
 import TextTicker from 'react-native-text-ticker';
@@ -9,7 +9,7 @@ interface TextLoopTickerPropType {
   style?: ViewStyle;
 }
 
-const TextLoopTicker = ({content, style}: TextLoopTickerPropType) => {
+const TextLoopTicker = ({ content, style }: TextLoopTickerPropType) => {
   return (
     <View style={[styles.container, style]}>
       <TextTicker

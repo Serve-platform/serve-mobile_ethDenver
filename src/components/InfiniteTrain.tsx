@@ -1,6 +1,6 @@
-import {Image, StyleSheet, View, Animated} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {railroad, train} from '~/assets/icons';
+import { Image, StyleSheet, View, Animated } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { railroad, train } from '~/assets/icons';
 
 const railroadWidth = 200;
 const trainWidth = 50;
@@ -21,7 +21,7 @@ const InfiniteTrain = () => {
   const doLoop = (animation: any) => animation(trainPos, value2).start();
 
   useEffect(() => {
-    trainPos.addListener(({value}) => {
+    trainPos.addListener(({ value }) => {
       if (value === 100) {
         trainPos.setValue(-150);
         doLoop(makeAnimation);
@@ -61,7 +61,7 @@ export default InfiniteTrain;
 
 const styles = StyleSheet.create({
   container: {
-    height: 200,
+    height: 100,
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',

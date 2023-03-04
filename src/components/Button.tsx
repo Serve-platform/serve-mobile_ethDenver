@@ -1,4 +1,4 @@
-import {StyleSheet, Text, TouchableOpacity, ViewStyle} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
 
 import React from 'react';
 import theme from '~/styles/color';
@@ -10,7 +10,13 @@ type Props = {
   style?: ViewStyle;
   type?: 'default' | 'small' | 'yellow' | 'white';
 };
-const Button = ({disabled, title, onPress, style, type = 'default'}: Props) => {
+const Button = ({
+  disabled,
+  title,
+  onPress,
+  style,
+  type = 'default',
+}: Props) => {
   const button = () => {
     switch (type) {
       case 'small':

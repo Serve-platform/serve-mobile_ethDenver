@@ -1,15 +1,38 @@
-import {View, Text, Image, TouchableOpacity} from 'react-native';
-import React from 'react';
-import QRCode from 'react-native-qrcode-svg';
-import {GlobalProps} from '~/navigators/GlobalNav';
-import {close} from '~/assets/icons';
-import {useRoute} from '@react-navigation/native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-const QrScreen = ({navigation}: GlobalProps) => {
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import QRCode from 'react-native-qrcode-svg';
+import { QrScreenProps } from '~/navigators/GlobalNav';
+import React from 'react';
+import { close } from '~/assets/icons';
+import { getQrSvg } from '~/api';
+import { useQuery } from 'react-query';
+import { useRoute } from '@react-navigation/native';
+
+const QrScreen = ({ navigation }: QrScreenProps) => {
   let base64Logo = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAA..';
   const route = useRoute();
   const qrInfo = (route!.params! as any).qrData;
-  console.log(qrInfo, 'qrInfo');
+
+  const balance = 1;
+  const token = 'abc';
+
+  useQuery(
+    ['getQrSvg', token],
+    async () => {
+      const address = await AsyncStorage.getItem('Address');
+
+      if (address) {
+        const result = await getQrSvg({
+          address,
+          balance,
+        });
+        return result;
+      }
+    },
+    { enabled: !!token },
+  );
+
   return (
     <View
       style={{
@@ -19,9 +42,9 @@ const QrScreen = ({navigation}: GlobalProps) => {
         backgroundColor: 'black',
       }}>
       <TouchableOpacity
-        style={{position: 'absolute', left: 30, top: 30}}
+        style={{ position: 'absolute', left: 30, top: 30 }}
         onPress={() => navigation.goBack()}>
-        <Image source={close} style={{width: 15, height: 15}} />
+        <Image source={close} style={{ width: 15, height: 15 }} />
       </TouchableOpacity>
       <View
         style={{
@@ -33,7 +56,7 @@ const QrScreen = ({navigation}: GlobalProps) => {
         }}>
         <QRCode
           value="Just some string value"
-          logo={{uri: base64Logo}}
+          logo={{ uri: base64Logo }}
           logoSize={30}
           logoBackgroundColor="transparent"
         />

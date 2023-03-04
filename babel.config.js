@@ -2,7 +2,7 @@ module.exports = {
   presets: ['module:metro-react-native-babel-preset'],
   env: {
     production: {
-      plugins: ['transform-remove-console'], //removing consoles.log from app during release (production) versions
+      plugins: ["transform-remove-console"],     //removing consoles.log from app during release (production) versions
     },
   },
   plugins: [
@@ -31,7 +31,7 @@ module.exports = {
           '@assets': './src/assets',
           '@styles': './src/styles',
           '@types': './src/types',
-          '@utils': './src/utils',
+          '@utils': './src/utils'
         },
       },
     ],
