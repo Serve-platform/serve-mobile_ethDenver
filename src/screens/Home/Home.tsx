@@ -20,7 +20,7 @@ import {
   seatIdState,
 } from '~/recoil/atoms';
 import { useMutation, useQuery } from 'react-query';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DragButton from '~/components/DragButton';
@@ -95,7 +95,14 @@ const Home = () => {
                   }}>
                   {data.bookUser.nickName}
                 </Text>
-                <Text>의 양보요청</Text>
+                <Text
+                  style={{
+                    color: theme.color.black,
+                    textAlign: 'center',
+                    marginBottom: 20,
+                  }}>
+                  의 양보요청
+                </Text>
               </View>
             ),
           });
@@ -118,6 +125,7 @@ const Home = () => {
   const getNickName = async () => {
     const nickNameState = (await AsyncStorage.getItem('nickName')) || '';
     setNickName(nickNameState);
+    console.log('> account?.address ');
   };
 
   useEffect(() => {
@@ -206,7 +214,7 @@ const Home = () => {
                 fontSize: 20,
                 color: theme.color.white,
               }}>
-              {boardInfo.trainUuid !== ''
+              {isWatch
                 ? `${boardInfo.trainLocation}메트로 ${boardInfo.trainLine}호선 ${boardInfo.trainUuid}열차 ${boardInfo.doorNumber}호칸 탑승 중`
                 : '탑승 정보 입력'}
             </Text>
