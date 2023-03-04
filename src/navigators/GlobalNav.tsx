@@ -13,10 +13,12 @@ import QrScan from '~/screens/QrScan';
 import TransferModal from '~/screens/TransferModal';
 import BoardingInfo from '~/screens/Home/BoardingInfo';
 import theme from '~/styles/color';
-import {close} from '~/assets/icons';
 import {useNavigation} from '@react-navigation/native';
 import ConfirmDeal from '@screens/Find/ConfirmDeal';
 import ConfirmDealByPassword from '@screens/Find/ConfirmDealByPassword';
+import SelectSeatInfo from '~/screens/Home/SelectSeatInfo';
+import {backArrow, close} from '~/assets/icons';
+
 type GlobalStackParamList = {
   SignUp: undefined;
   TabNav: undefined;
@@ -26,6 +28,7 @@ type GlobalStackParamList = {
   ConfirmDeal: {value: any};
   ConfirmDealByPassword: {seatId: number};
   BoardingInfo: undefined;
+  SelectSeatInfo: undefined;
 };
 
 export type SignUpProps = NativeStackScreenProps<
@@ -79,6 +82,17 @@ const GlobalNav = () => {
     <>
       <Stack.Navigator
         screenOptions={{
+          headerTitleAlign: 'center',
+          headerStyle: {
+            height: 80,
+            backgroundColor: theme.color.black,
+          },
+          cardStyle: {backgroundColor: theme.color.black},
+          headerTitleStyle: {
+            fontSize: 16,
+            color: theme.color.white,
+            fontWeight: '900',
+          },
           cardStyleInterpolator:
             Platform.OS === 'android'
               ? CardStyleInterpolators.forFadeFromBottomAndroid
@@ -121,6 +135,27 @@ const GlobalNav = () => {
             ),
           }}
           component={BoardingInfo}
+        />
+        <Stack.Screen
+          name="SelectSeatInfo"
+          options={{
+            headerTitle: '탑승정보 입력',
+            headerLeft: () => (
+              <TouchableOpacity
+                hitSlop={{top: 30, bottom: 30, left: 30, right: 30}}
+                style={{marginLeft: 30}}
+                onPress={() => navigation.goBack()}>
+                <Image
+                  style={{
+                    width: 16,
+                    height: 16,
+                  }}
+                  source={backArrow}
+                />
+              </TouchableOpacity>
+            ),
+          }}
+          component={SelectSeatInfo}
         />
         <Stack.Screen
           name="QrScreen"

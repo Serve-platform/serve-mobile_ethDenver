@@ -12,6 +12,8 @@ import downArrow from './downArrow.png';
 import avatar from './avatar.png';
 import close from './close.png';
 import remove from './remove.png';
+import upArrow from './upArrow.png';
+import backArrow from './backArrow.png';
 
 export {
   home,
@@ -28,4 +30,6 @@ export {
   avatar,
   close,
   remove,
+  upArrow,
+  backArrow,
 };
