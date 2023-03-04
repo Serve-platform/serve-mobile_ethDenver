@@ -1,4 +1,5 @@
-import {StyleSheet, Text, ViewStyle, TouchableOpacity} from 'react-native';
+import {StyleSheet, Text, TouchableOpacity, ViewStyle} from 'react-native';
+
 import React from 'react';
 import theme from '~/styles/color';
 
@@ -23,9 +24,7 @@ const Button = ({title, clickEvent, style, type = 'default'}: Props) => {
   };
 
   return (
-    <TouchableOpacity
-      style={[styles.container, style]}
-      onPress={() => (clickEvent ? clickEvent : null)}>
+    <TouchableOpacity style={[styles.container, style]} onPress={clickEvent}>
       {button()}
     </TouchableOpacity>
   );
