@@ -21,41 +21,38 @@ import {HomeStackNavProps} from '~/navigators/stackNav/HomeStackNav';
 import {useNavigation} from '@react-navigation/native';
 import TextTicker from 'react-native-text-ticker';
 import useBluetooth from '~/hooks/useBluetooth';
+import {useSetRecoilState} from 'recoil';
+import {modalState} from '~/recoils/atoms';
 
 const Home = () => {
   const navigation = useNavigation<HomeStackNavProps>();
+  const setModalOpen = useSetRecoilState(modalState);
   const [onServe, setOnServe] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
-  const [OnmodalVisible, setOnModalVisible] = useState(false);
+  const [onModalVisible, setOnModalVisible] = useState(false);
   const moveAnim = useRef(new Animated.Value(-2)).current;
   const [qrData, setQrData] = useState('');
+  const [nickName, setNickName] = useState(null);
+
   const {onAdvertiseStart, onAdvertiseStop} = useBluetooth();
 
-  const moveOn = () => {
-    Animated.timing(moveAnim, {
-      toValue: 92,
-      duration: 150,
-      easing: Easing.linear,
-      useNativeDriver: true,
-    }).start();
-  };
   const moveQr = () => {
-    setOnModalVisible(!OnmodalVisible);
+    setOnModalVisible(!onModalVisible);
     navigation.navigate('QrScan');
   };
-  const balance__ = 1;
+  const balance = 1;
   const token = 'abc';
 
   const getQrSvgQuery = useQuery(
     ['getQrSvg', token],
     async () => {
-      const address__ = await AsyncStorage.getItem('Address');
+      const address = await AsyncStorage.getItem('Address');
 
-      if (address__) {
+      if (address) {
         const result = await getQrSvg({
-          token__: token,
-          address__: address__,
-          balance__: balance__,
+          // token,
+          address,
+          balance,
         });
         return result;
       }
@@ -71,10 +68,100 @@ const Home = () => {
       qrData: qrSvg,
     });
   };
-  const onAdvertise = () => {
+
+  const onAdvertise = async () => {
+    setModalOpen({
+      children: (
+        <View
+          style={{
+            width: 320,
+            height: 290,
+            backgroundColor: theme.color.white,
+            alignItems: 'center',
+            alignSelf: 'center',
+            justifyContent: 'space-around',
+            borderRadius: 20,
+          }}>
+          <View style={{alignItems: 'center'}}>
+            <Text
+              style={{
+                color: theme.color.black,
+                fontWeight: '700',
+                fontSize: 20,
+                marginTop: 20,
+              }}>
+              Nick Name
+            </Text>
+            <Text
+              style={{
+                color: theme.color.black,
+                fontWeight: '600',
+                fontSize: 14,
+              }}>
+              의 양보 요청 수락
+            </Text>
+            <Text
+              style={{
+                color: theme.color.black,
+                fontWeight: '600',
+                fontSize: 14,
+              }}>
+              ~~의 좌석으로 이동하세요
+            </Text>
+          </View>
+          <View style={{position: 'absolute', bottom: 250}}>
+            <Image
+              source={avatar}
+              style={{
+                width: 80,
+                height: 80,
+              }}
+            />
+          </View>
+
+          <TouchableOpacity
+            style={{
+              backgroundColor: '#EFFF37',
+              width: 275,
+              height: 50,
+              borderRadius: 50,
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderWidth: 2,
+              borderColor: 'black',
+            }}
+            onPress={() => {}}>
+            <Text style={{fontSize: 18, color: theme.color.black}}>
+              거래하기
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {}}>
+            <Text style={{color: theme.color.black}}>거절</Text>
+          </TouchableOpacity>
+        </View>
+      ),
+      isOpen: true,
+    });
+
     const currentServeState = !onServe;
+
     setOnServe(currentServeState);
-    currentServeState ? onAdvertiseStart() : onAdvertiseStop();
+
+    if (currentServeState) {
+      const uuid = await AsyncStorage.getItem('uuid');
+      uuid && onAdvertiseStart(uuid);
+    } else {
+      onAdvertiseStop();
+    }
+  };
+
+  const moveOn = () => {
+    Animated.timing(moveAnim, {
+      toValue: 92,
+      duration: 150,
+      easing: Easing.linear,
+      useNativeDriver: true,
+    }).start();
   };
 
   const moveOff = () => {
@@ -85,6 +172,16 @@ const Home = () => {
       useNativeDriver: true,
     }).start();
   };
+
+  const getNickName = async () => {
+    const nickName = await AsyncStorage.getItem('nickName');
+    // @ts-ignore
+    setNickName(nickName);
+  };
+
+  useEffect(() => {
+    getNickName().then();
+  }, []);
 
   useEffect(() => {
     if (onServe) {
@@ -107,7 +204,7 @@ const Home = () => {
         <View>
           <Text style={styles.title}>
             Hi,
-            <Text style={{color: theme.color.main}}> Wendy!</Text>
+            <Text style={{color: theme.color.main}}> {nickName}!</Text>
           </Text>
           <Text
             style={{
@@ -134,8 +231,8 @@ const Home = () => {
         style={{
           marginVertical: 24,
           alignSelf: 'center',
-          width: 206,
-          height: 199,
+          width: (206 / 360) * Dimensions.get('window').width,
+          height: (206 / 760) * Dimensions.get('window').height,
         }}
       />
       {/* 탑승 정보 */}
@@ -193,15 +290,7 @@ const Home = () => {
       {/* SERVE 드래그 버튼 */}
       <View style={styles.dragContainer}>
         <>
-          <Pressable
-            // onPress={() => {
-            //   setOnServe(!onServe);
-            //   // todo 블루투스 연결
-            //   // onServe
-            //   //   ? setModalVisible(!modalVisible)
-            //   //   : setOnModalVisible(!OnmodalVisible);
-            // }}>
-            onPress={onAdvertise}>
+          <Pressable onPress={onAdvertise}>
             <Animated.View
               style={[
                 styles.dragEnableButton,
@@ -240,12 +329,6 @@ const Home = () => {
           <View style={[styles.dragDisableButton, {bottom: -2, left: -2}]}>
             <Text style={styles.dragDisableText}>Drag to SERVE</Text>
           </View>
-          <View style={{alignItems: 'center'}}>
-            <View style={{alignItems: 'center'}}>
-              <OffModal offModalData={moveQrCode} modalVisible={modalVisible} />
-              <OnModal onModalData={moveQr} modalVisible={OnmodalVisible} />
-            </View>
-          </View>
         </>
       </View>
     </View>
@@ -272,7 +355,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dragContainer: {
-    marginTop: 38,
     alignSelf: 'center',
     width: Dimensions.get('window').width - 90,
     height: 164,
@@ -280,9 +362,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: theme.color.main,
     borderStyle: 'dashed',
+    marginTop: 'auto',
+    marginBottom: 'auto',
   },
   dragEnableButton: {
-    // position: 'absolute',
     width: Dimensions.get('window').width - 90,
     borderWidth: 2,
     borderColor: theme.color.main,
